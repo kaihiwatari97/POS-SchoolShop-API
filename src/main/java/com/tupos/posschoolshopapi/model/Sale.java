@@ -1,6 +1,9 @@
 package com.tupos.posschoolshopapi.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -9,7 +12,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.CascadeType;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,16 +26,27 @@ public class Sale {
 
     private LocalDateTime date;
 
-    @ManyToOne // muchas ventas pueden pertenecer al mismo alumno (puede ser null si paga en efectivo)
+    @JsonIgnore // le dice a Jackson que no incluya este campo directamente en el JSON
+    @ManyToOne
     private Student student;
 
-    @OneToMany(cascade = CascadeType.ALL) // una venta tiene muchos SaleDetail. CascadeType.ALL significa que si eliminas la venta, se eliminan sus detalles también
+    @OneToMany(cascade = CascadeType.ALL)
     private List<SaleDetail> saleDetails;
 
     private Double total;
 
-    @Enumerated(EnumType.STRING) // guarda el enum como texto en PostgreSQL ("CASH" o "PREPAID_BALANCE") en vez de un número
+    @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
+
+    // este metodo reemplaza al campo student en el JSON
+    // @JsonProperty("student") le dice a Jackson que use "student" como nombre del campo en el JSON
+    @JsonProperty("student")
+    public String getStudentDisplay() {
+        if (student == null) {
+            return "Venta en efectivo";
+        }
+        return student.getName();
+    }
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
