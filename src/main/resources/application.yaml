@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: POS-SchoolShop-API
+  datasource:
+    url: jdbc:postgresql://localhost:5432/pos_tienda
+    username: postgres
+    password: admin12345
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
