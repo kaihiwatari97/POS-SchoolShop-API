@@ -1,10 +1,12 @@
 package com.tupos.posschoolshopapi.model;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
+@JsonPropertyOrder({"id", "name", "description", "price", "stock"})
 @Entity
 public class Product {
 

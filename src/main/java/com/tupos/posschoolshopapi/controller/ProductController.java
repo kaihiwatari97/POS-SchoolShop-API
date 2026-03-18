@@ -7,22 +7,42 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-    @RequestMapping("/api/productos")
-    public class ProductController {
+@RequestMapping("/api/products")
+public class ProductController {
 
-        private final ProductRepository productRepository;
+    private final ProductRepository productRepository;
 
-        public ProductController(ProductRepository productRepository) {
-            this.productRepository = productRepository;
+    public ProductController(ProductRepository productRepository) {
+        this.productRepository = productRepository;
     }
 
     @GetMapping
-    public List<Product> listarTodos() {
+    public List<Product> getAll() {
         return productRepository.findAll();
     }
 
+    @GetMapping("/{id}")
+    public Product getById(@PathVariable Long id) {
+        return productRepository.findById(id).orElseThrow();
+    }
+
     @PostMapping
-    public Product crear(@RequestBody Product product) {
+    public Product create(@RequestBody Product product) {
         return productRepository.save(product);
+    }
+
+    @PutMapping("/{id}")
+    public Product update(@PathVariable Long id, @RequestBody Product updated) {
+        Product product = productRepository.findById(id).orElseThrow();
+        product.setName(updated.getName());
+        product.setDescription(updated.getDescription());
+        product.setPrice(updated.getPrice());
+        product.setStock(updated.getStock());
+        return productRepository.save(product);
+    }
+
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        productRepository.deleteById(id);
     }
 }
