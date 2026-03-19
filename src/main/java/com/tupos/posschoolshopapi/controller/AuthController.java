@@ -7,6 +7,7 @@ import com.tupos.posschoolshopapi.security.JwtService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -25,7 +26,6 @@ public class AuthController {
         this.passwordEncoder = passwordEncoder;
     }
 
-    // endpoint de login — recibe username y password, devuelve token
     @PostMapping("/login")
     public Map<String, String> login(@RequestBody Map<String, String> request) {
         String username = request.get("username");
@@ -34,7 +34,6 @@ public class AuthController {
         StaffUser user = staffUserRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        // verifica que la contraseña coincida con el hash guardado en la base de datos
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new RuntimeException("Contraseña incorrecta");
         }
@@ -48,7 +47,6 @@ public class AuthController {
         );
     }
 
-    // endpoint temporal para crear el primer admin — lo eliminaremos después
     @PostMapping("/setup")
     public Map<String, String> setup(@RequestBody Map<String, String> request) {
         if (staffUserRepository.count() > 0) {
@@ -57,10 +55,43 @@ public class AuthController {
 
         StaffUser admin = new StaffUser();
         admin.setUsername(request.get("username"));
-        admin.setPassword(passwordEncoder.encode(request.get("password"))); // encripta la contraseña
+        admin.setPassword(passwordEncoder.encode(request.get("password")));
         admin.setRole(StaffRole.ADMIN);
         staffUserRepository.save(admin);
 
         return Map.of("message", "Admin creado correctamente");
+    }
+
+    // solo admins pueden llamar este endpoint — lo protege SecurityConfig
+    @GetMapping("/users")
+    public List<Map<String, String>> getUsers() {
+        return staffUserRepository.findAll().stream()
+                .map(u -> Map.of(
+                        "id", u.getId().toString(),
+                        "username", u.getUsername(),
+                        "role", u.getRole().name()
+                ))
+                .toList();
+    }
+
+    @PostMapping("/users")
+    public Map<String, String> createUser(@RequestBody Map<String, String> request) {
+        if (staffUserRepository.findByUsername(request.get("username")).isPresent()) {
+            throw new RuntimeException("El usuario ya existe");
+        }
+
+        StaffUser user = new StaffUser();
+        user.setUsername(request.get("username"));
+        user.setPassword(passwordEncoder.encode(request.get("password")));
+        user.setRole(StaffRole.valueOf(request.get("role")));
+        staffUserRepository.save(user);
+
+        return Map.of("message", "Usuario creado correctamente");
+    }
+
+    @DeleteMapping("/users/{id}")
+    public Map<String, String> deleteUser(@PathVariable Long id) {
+        staffUserRepository.deleteById(id);
+        return Map.of("message", "Usuario eliminado");
     }
 }
