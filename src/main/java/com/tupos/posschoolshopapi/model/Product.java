@@ -7,7 +7,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
-@JsonPropertyOrder({"id", "name", "description", "price", "stock", "barcode"})
+@JsonPropertyOrder({"id", "name", "description", "price", "stock", "barcode", "imageUrl"})
 @Entity
 public class Product {
 
@@ -20,8 +20,10 @@ public class Product {
     private Double price;
     private Integer stock;
 
-    @Column(unique = true) // no pueden existir dos productos con el mismo codigo
+    @Column(unique = true)
     private String barcode;
+
+    private String imageUrl;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -40,4 +42,7 @@ public class Product {
 
     public String getBarcode() { return barcode; }
     public void setBarcode(String barcode) { this.barcode = barcode; }
+
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 }

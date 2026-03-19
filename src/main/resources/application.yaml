@@ -9,3 +9,12 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+  servlet:
+    multipart:
+      max-file-size: 30MB
+      max-request-size: 30MB
+
+cloudinary:
+  cloud-name: daqwtec39
+  api-key: 569271973363167
+  api-secret: 8G5MkFUgyq7SgnjESZOqjnkp9ow

@@ -39,6 +39,7 @@ public class ProductController {
         product.setPrice(updated.getPrice());
         product.setStock(updated.getStock());
         product.setBarcode(updated.getBarcode());
+        product.setImageUrl(updated.getImageUrl());
         return productRepository.save(product);
     }
 
