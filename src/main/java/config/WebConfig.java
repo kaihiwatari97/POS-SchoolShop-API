@@ -13,4 +13,5 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedOrigins("*") // permite peticiones de cualquier origen
                 .allowedMethods("GET", "POST", "PUT", "DELETE"); // métodos permitidos
     }
+    // Commit anterior creado incorrectamente
 }
