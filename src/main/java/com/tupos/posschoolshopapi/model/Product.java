@@ -1,12 +1,13 @@
 package com.tupos.posschoolshopapi.model;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
-@JsonPropertyOrder({"id", "name", "description", "price", "stock"})
+@JsonPropertyOrder({"id", "name", "description", "price", "stock", "barcode"})
 @Entity
 public class Product {
 
@@ -18,6 +19,9 @@ public class Product {
     private String description;
     private Double price;
     private Integer stock;
+
+    @Column(unique = true) // no pueden existir dos productos con el mismo codigo
+    private String barcode;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -33,4 +37,7 @@ public class Product {
 
     public Integer getStock() { return stock; }
     public void setStock(Integer stock) { this.stock = stock; }
+
+    public String getBarcode() { return barcode; }
+    public void setBarcode(String barcode) { this.barcode = barcode; }
 }
