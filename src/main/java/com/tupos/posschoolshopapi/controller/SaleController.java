@@ -10,6 +10,8 @@ import com.tupos.posschoolshopapi.model.PaymentMethod;
 import com.tupos.posschoolshopapi.repository.SaleRepository;
 import com.tupos.posschoolshopapi.repository.ProductRepository;
 import com.tupos.posschoolshopapi.repository.StudentRepository;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -41,21 +43,24 @@ public class SaleController {
     @PostMapping
     public Sale create(@RequestBody Map<String, Object> request) {
 
+        // obtiene el usuario logueado del token JWT
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String staffUsername = auth != null ? auth.getName() : "desconocido";
+
         PaymentMethod paymentMethod = PaymentMethod.valueOf((String) request.get("paymentMethod"));
 
         Sale sale = new Sale();
         sale.setDate(LocalDateTime.now());
         sale.setPaymentMethod(paymentMethod);
+        sale.setStaffUsername(staffUsername);
 
         if (paymentMethod == PaymentMethod.PREPAID_BALANCE) {
             Long studentId = Long.valueOf(request.get("studentId").toString());
             Student student = studentRepository.findById(studentId)
                     .orElseThrow(() -> new ResourceNotFoundException("Alumno no encontrado con id: " + studentId));
-
             if (student.getPrepaidBalance() <= 0) {
                 throw new BadRequestException("El alumno no tiene saldo suficiente");
             }
-
             sale.setStudent(student);
         }
 

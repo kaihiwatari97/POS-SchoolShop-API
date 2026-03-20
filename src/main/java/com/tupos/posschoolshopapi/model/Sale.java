@@ -16,7 +16,7 @@ import jakarta.persistence.OneToMany;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@JsonPropertyOrder({"id", "date", "student", "saleDetails", "total", "paymentMethod"})
+@JsonPropertyOrder({"id", "date", "staffUsername", "student", "saleDetails", "total", "paymentMethod"})
 @Entity
 public class Sale {
 
@@ -26,7 +26,9 @@ public class Sale {
 
     private LocalDateTime date;
 
-    @JsonIgnore // le dice a Jackson que no incluya este campo directamente en el JSON
+    private String staffUsername; // usuario del sistema que realizó la venta
+
+    @JsonIgnore
     @ManyToOne
     private Student student;
 
@@ -38,13 +40,9 @@ public class Sale {
     @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
 
-    // este metodo reemplaza al campo student en el JSON
-    // @JsonProperty("student") le dice a Jackson que use "student" como nombre del campo en el JSON
     @JsonProperty("student")
     public String getStudentDisplay() {
-        if (student == null) {
-            return "Venta en efectivo";
-        }
+        if (student == null) return "Venta en efectivo";
         return student.getName();
     }
 
@@ -53,6 +51,9 @@ public class Sale {
 
     public LocalDateTime getDate() { return date; }
     public void setDate(LocalDateTime date) { this.date = date; }
+
+    public String getStaffUsername() { return staffUsername; }
+    public void setStaffUsername(String staffUsername) { this.staffUsername = staffUsername; }
 
     public Student getStudent() { return student; }
     public void setStudent(Student student) { this.student = student; }

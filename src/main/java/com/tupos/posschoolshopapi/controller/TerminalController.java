@@ -17,6 +17,10 @@ public class TerminalController {
         if (ip == null || ip.isEmpty()) {
             ip = request.getRemoteAddr();
         }
+        // convierte IPv6 localhost a texto legible
+        if (ip.equals("0:0:0:0:0:0:0:1") || ip.equals("::1")) {
+            ip = "localhost";
+        }
         return Map.of("ip", ip);
     }
 }
