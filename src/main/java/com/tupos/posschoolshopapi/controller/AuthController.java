@@ -6,6 +6,8 @@ import com.tupos.posschoolshopapi.repository.StaffUserRepository;
 import com.tupos.posschoolshopapi.security.JwtService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
+import java.util.Optional;
 
 import java.util.List;
 import java.util.Map;
@@ -27,24 +29,26 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public Map<String, String> login(@RequestBody Map<String, String> request) {
+    public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
         String username = request.get("username");
         String password = request.get("password");
 
-        StaffUser user = staffUserRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        Optional<StaffUser> userOpt = staffUserRepository.findByUsername(username);
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.status(401).body(Map.of("error", "Usuario no existe"));
+        }
 
+        StaffUser user = userOpt.get();
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new RuntimeException("Contraseña incorrecta");
+            return ResponseEntity.status(401).body(Map.of("error", "Contraseña incorrecta"));
         }
 
         String token = jwtService.generateToken(username, user.getRole().name());
-
-        return Map.of(
+        return ResponseEntity.ok(Map.of(
                 "token", token,
                 "role", user.getRole().name(),
                 "username", username
-        );
+        ));
     }
 
     @PostMapping("/setup")
