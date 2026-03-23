@@ -1,58 +1,62 @@
 package com.tupos.posschoolshopapi.production;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.http.*;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
+
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class AuthProdTest {
 
-    // cambia esta URL cuando tengas Railway
-    static final String BASE_URL = "https://aqui-va-tu-url-de-railway.railway.app";
-    RestTemplate restTemplate = new RestTemplate();
+    static final String BASE_URL = "https://pos-schoolshop-api-production.up.railway.app";
+    HttpClient client = HttpClient.newHttpClient();
 
     @Test
-    void loginCorrecto() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> request = new HttpEntity<>(
-                "{ \"username\": \"admin\", \"password\": \"admin12345\" }", headers);
+    void loginCorrecto() throws Exception {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL + "/api/auth/login"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(
+                        "{ \"username\": \"admin\", \"password\": \"admin123\" }"))
+                .build();
 
-        ResponseEntity<String> response = restTemplate.postForEntity(
-                BASE_URL + "/api/auth/login", request, String.class);
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        assertEquals(200, response.getStatusCode().value());
-        assertTrue(response.getBody().contains("token"));
-        assertTrue(response.getBody().contains("ADMIN"));
+        assertEquals(200, response.statusCode());
+        assertTrue(response.body().contains("token"));
+        assertTrue(response.body().contains("ADMIN"));
     }
 
     @Test
-    void loginUsuarioIncorrecto() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> request = new HttpEntity<>(
-                "{ \"username\": \"noexiste\", \"password\": \"cualquiera\" }", headers);
+    void loginUsuarioIncorrecto() throws Exception {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL + "/api/auth/login"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(
+                        "{ \"username\": \"noexiste\", \"password\": \"cualquiera\" }"))
+                .build();
 
-        HttpClientErrorException ex = assertThrows(HttpClientErrorException.class, () ->
-                restTemplate.postForEntity(BASE_URL + "/api/auth/login", request, String.class));
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        assertEquals(401, ex.getStatusCode().value());
-        assertTrue(ex.getResponseBodyAsString().contains("Usuario no existe"));
+        assertEquals(401, response.statusCode());
+        assertTrue(response.body().contains("Usuario no existe"));
     }
 
     @Test
-    void loginContrasenaIncorrecta() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> request = new HttpEntity<>(
-                "{ \"username\": \"admin\", \"password\": \"wrongpassword\" }", headers);
+    void loginContrasenaIncorrecta() throws Exception {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL + "/api/auth/login"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(
+                        "{ \"username\": \"admin\", \"password\": \"wrongpassword\" }"))
+                .build();
 
-        HttpClientErrorException ex = assertThrows(HttpClientErrorException.class, () ->
-                restTemplate.postForEntity(BASE_URL + "/api/auth/login", request, String.class));
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        assertEquals(401, ex.getStatusCode().value());
-        assertTrue(ex.getResponseBodyAsString().contains("Contraseña incorrecta"));
+        assertEquals(401, response.statusCode());
+        assertTrue(response.body().contains("Contraseña incorrecta"));
     }
 }
