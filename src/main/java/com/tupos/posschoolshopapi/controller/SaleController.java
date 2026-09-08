@@ -59,11 +59,11 @@ public class SaleController {
         sale.setPaymentMethod(paymentMethod);
         sale.setStaffUsername(staffUsername);
 
-        if (paymentMethod == PaymentMethod.PREPAID_BALANCE) {
+        if (paymentMethod == PaymentMethod.PREPAID_BALANCE || paymentMethod == PaymentMethod.FIADO) {
             Long studentId = Long.valueOf(request.get("studentId").toString());
             Student student = studentRepository.findById(studentId)
                     .orElseThrow(() -> new ResourceNotFoundException("Alumno no encontrado con id: " + studentId));
-            if (student.getPrepaidBalance() <= 0) {
+            if (paymentMethod == PaymentMethod.PREPAID_BALANCE && student.getPrepaidBalance() <= 0) {
                 throw new BadRequestException("El alumno no tiene saldo suficiente");
             }
             sale.setStudent(student);
@@ -101,6 +101,10 @@ public class SaleController {
             if (student.getPrepaidBalance() < total) {
                 throw new BadRequestException("Saldo insuficiente. Saldo actual: " + student.getPrepaidBalance() + ", Total: " + total);
             }
+            student.setPrepaidBalance(student.getPrepaidBalance() - total);
+            studentRepository.save(student);
+        } else if (paymentMethod == PaymentMethod.FIADO) {
+            Student student = sale.getStudent();
             student.setPrepaidBalance(student.getPrepaidBalance() - total);
             studentRepository.save(student);
         }

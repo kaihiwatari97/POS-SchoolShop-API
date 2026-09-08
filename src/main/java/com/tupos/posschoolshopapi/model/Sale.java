@@ -42,8 +42,8 @@ public class Sale {
 
     @JsonProperty("student")
     public String getStudentDisplay() {
-        if (student == null) return "Venta en efectivo";
-        return student.getName();
+        if (student != null) return student.getName();
+        return paymentMethod == PaymentMethod.CARD ? "Venta con tarjeta" : "Venta en efectivo";
     }
 
     @JsonProperty("studentId")
