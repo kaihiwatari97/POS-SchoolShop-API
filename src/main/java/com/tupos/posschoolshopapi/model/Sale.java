@@ -16,7 +16,7 @@ import jakarta.persistence.OneToMany;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@JsonPropertyOrder({"id", "date", "staffUsername", "student", "saleDetails", "total", "paymentMethod"})
+@JsonPropertyOrder({"id", "date", "staffUsername", "studentId", "student", "saleDetails", "total", "paymentMethod"})
 @Entity
 public class Sale {
 
@@ -44,6 +44,11 @@ public class Sale {
     public String getStudentDisplay() {
         if (student == null) return "Venta en efectivo";
         return student.getName();
+    }
+
+    @JsonProperty("studentId")
+    public Long getStudentId() {
+        return student == null ? null : student.getId();
     }
 
     public Long getId() { return id; }

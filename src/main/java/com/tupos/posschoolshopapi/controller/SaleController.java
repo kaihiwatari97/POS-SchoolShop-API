@@ -40,6 +40,11 @@ public class SaleController {
         return saleRepository.findAll();
     }
 
+    @GetMapping("/student/{studentId}")
+    public List<Sale> getByStudent(@PathVariable Long studentId) {
+        return saleRepository.findByStudentId(studentId);
+    }
+
     @PostMapping
     public Sale create(@RequestBody Map<String, Object> request) {
 

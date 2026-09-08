@@ -4,6 +4,7 @@ import com.tupos.posschoolshopapi.model.Student;
 import com.tupos.posschoolshopapi.repository.StudentRepository;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController // le dice a Spring que esta clase maneja peticiones HTTP y devuelve JSON
@@ -28,6 +29,7 @@ public class StudentController {
 
     @PostMapping // responde a POST /api/students — crea un alumno nuevo
     public Student create(@RequestBody Student student) {
+        student.setEnrollmentDate(LocalDate.now());
         return studentRepository.save(student);
     }
 
@@ -38,6 +40,8 @@ public class StudentController {
         student.setGrade(updated.getGrade());
         student.setLevel(updated.getLevel());
         student.setGroup(updated.getGroup());
+        student.setTutorName(updated.getTutorName());
+        student.setTutorPhone(updated.getTutorPhone());
         student.setPrepaidBalance(updated.getPrepaidBalance());
         return studentRepository.save(student);
     }

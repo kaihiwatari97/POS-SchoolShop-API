@@ -7,7 +7,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
-@JsonPropertyOrder({"id", "name", "level", "grade", "group", "prepaidBalance"})
+import java.time.LocalDate;
+
+@JsonPropertyOrder({"id", "name", "tutorName", "tutorPhone", "level", "grade", "group", "prepaidBalance", "enrollmentDate"})
 @Entity
 public class Student {
 
@@ -22,7 +24,12 @@ public class Student {
     @Column(name = "student_group")
     private String group;
 
+    private String tutorName;
+    private String tutorPhone;
+
     private Double prepaidBalance;
+
+    private LocalDate enrollmentDate;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -39,6 +46,15 @@ public class Student {
     public String getGroup() { return group; }
     public void setGroup(String group) { this.group = group; }
 
+    public String getTutorName() { return tutorName; }
+    public void setTutorName(String tutorName) { this.tutorName = tutorName; }
+
+    public String getTutorPhone() { return tutorPhone; }
+    public void setTutorPhone(String tutorPhone) { this.tutorPhone = tutorPhone; }
+
     public Double getPrepaidBalance() { return prepaidBalance; }
     public void setPrepaidBalance(Double prepaidBalance) { this.prepaidBalance = prepaidBalance; }
+
+    public LocalDate getEnrollmentDate() { return enrollmentDate; }
+    public void setEnrollmentDate(LocalDate enrollmentDate) { this.enrollmentDate = enrollmentDate; }
 }
