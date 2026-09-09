@@ -10,6 +10,7 @@ import com.tupos.posschoolshopapi.model.PaymentMethod;
 import com.tupos.posschoolshopapi.repository.SaleRepository;
 import com.tupos.posschoolshopapi.repository.ProductRepository;
 import com.tupos.posschoolshopapi.repository.StudentRepository;
+import com.tupos.posschoolshopapi.service.ActivityLogService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -26,13 +27,16 @@ public class SaleController {
     private final SaleRepository saleRepository;
     private final ProductRepository productRepository;
     private final StudentRepository studentRepository;
+    private final ActivityLogService activityLogService;
 
     public SaleController(SaleRepository saleRepository,
                           ProductRepository productRepository,
-                          StudentRepository studentRepository) {
+                          StudentRepository studentRepository,
+                          ActivityLogService activityLogService) {
         this.saleRepository = saleRepository;
         this.productRepository = productRepository;
         this.studentRepository = studentRepository;
+        this.activityLogService = activityLogService;
     }
 
     @GetMapping
@@ -112,6 +116,16 @@ public class SaleController {
         sale.setSaleDetails(details);
         sale.setTotal(total);
 
-        return saleRepository.save(sale);
+        Sale saved = saleRepository.save(sale);
+
+        String action = switch (paymentMethod) {
+            case CASH -> "Venta en efectivo";
+            case CARD -> "Venta en tarjeta";
+            case PREPAID_BALANCE -> "Venta tipo saldo al alumno: " + saved.getStudent().getName();
+            case FIADO -> "Venta tipo fiado al alumno: " + saved.getStudent().getName();
+        };
+        activityLogService.log(action, total);
+
+        return saved;
     }
 }

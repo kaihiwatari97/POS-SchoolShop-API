@@ -4,6 +4,7 @@ import com.tupos.posschoolshopapi.model.StaffRole;
 import com.tupos.posschoolshopapi.model.StaffUser;
 import com.tupos.posschoolshopapi.repository.StaffUserRepository;
 import com.tupos.posschoolshopapi.security.JwtService;
+import com.tupos.posschoolshopapi.service.ActivityLogService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
@@ -19,13 +20,16 @@ public class AuthController {
     private final StaffUserRepository staffUserRepository;
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
+    private final ActivityLogService activityLogService;
 
     public AuthController(StaffUserRepository staffUserRepository,
                           JwtService jwtService,
-                          PasswordEncoder passwordEncoder) {
+                          PasswordEncoder passwordEncoder,
+                          ActivityLogService activityLogService) {
         this.staffUserRepository = staffUserRepository;
         this.jwtService = jwtService;
         this.passwordEncoder = passwordEncoder;
+        this.activityLogService = activityLogService;
     }
 
     @PostMapping("/login")
@@ -90,11 +94,17 @@ public class AuthController {
         user.setRole(StaffRole.valueOf(request.get("role")));
         staffUserRepository.save(user);
 
+        String rolLabel = user.getRole() == StaffRole.ADMIN ? "administrador" : "empleado";
+        activityLogService.log("Alta de " + rolLabel + ": " + user.getUsername(), null);
+
         return Map.of("message", "Usuario creado correctamente");
     }
 
     @DeleteMapping("/users/{id}")
     public Map<String, String> deleteUser(@PathVariable Long id) {
+        StaffUser user = staffUserRepository.findById(id).orElseThrow();
+        String rolLabel = user.getRole() == StaffRole.ADMIN ? "administrador" : "empleado";
+        activityLogService.log("Baja de " + rolLabel + ": " + user.getUsername(), null);
         staffUserRepository.deleteById(id);
         return Map.of("message", "Usuario eliminado");
     }

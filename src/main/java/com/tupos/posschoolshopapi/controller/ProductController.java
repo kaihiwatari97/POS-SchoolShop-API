@@ -2,6 +2,7 @@ package com.tupos.posschoolshopapi.controller;
 
 import com.tupos.posschoolshopapi.model.Product;
 import com.tupos.posschoolshopapi.repository.ProductRepository;
+import com.tupos.posschoolshopapi.service.ActivityLogService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,9 +12,11 @@ import java.util.List;
 public class ProductController {
 
     private final ProductRepository productRepository;
+    private final ActivityLogService activityLogService;
 
-    public ProductController(ProductRepository productRepository) {
+    public ProductController(ProductRepository productRepository, ActivityLogService activityLogService) {
         this.productRepository = productRepository;
+        this.activityLogService = activityLogService;
     }
 
     @GetMapping
@@ -28,7 +31,9 @@ public class ProductController {
 
     @PostMapping
     public Product create(@RequestBody Product product) {
-        return productRepository.save(product);
+        Product saved = productRepository.save(product);
+        activityLogService.log("Alta de producto: " + saved.getName(), null);
+        return saved;
     }
 
     @PutMapping("/{id}")
@@ -40,11 +45,15 @@ public class ProductController {
         product.setStock(updated.getStock());
         product.setBarcode(updated.getBarcode());
         product.setImageUrl(updated.getImageUrl());
-        return productRepository.save(product);
+        Product saved = productRepository.save(product);
+        activityLogService.log("Edición de producto: " + saved.getName(), null);
+        return saved;
     }
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
+        Product product = productRepository.findById(id).orElseThrow();
+        activityLogService.log("Baja de producto: " + product.getName(), null);
         productRepository.deleteById(id);
     }
 }
