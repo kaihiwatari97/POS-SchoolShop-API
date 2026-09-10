@@ -104,6 +104,9 @@ public class StudentController {
         if (student.getPrepaidBalance() < 0) {
             throw new BadRequestException("No se puede eliminar al alumno " + student.getName() + " porque tiene saldo negativo ($" + student.getPrepaidBalance() + "). Debe regularizar el saldo antes de darlo de baja.");
         }
+        if (student.getPrepaidBalance() > 0) {
+            throw new BadRequestException("No se puede eliminar al alumno " + student.getName() + " porque tiene saldo a favor ($" + student.getPrepaidBalance() + "). El saldo debe estar en $0 antes de darlo de baja.");
+        }
 
         // desvincula las ventas del alumno (conservando su nombre) para no perder el historial al graduarse/eliminarse
         List<Sale> sales = saleRepository.findByStudent_Id(id);
