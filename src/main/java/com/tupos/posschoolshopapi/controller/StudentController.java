@@ -106,7 +106,7 @@ public class StudentController {
         }
 
         // desvincula las ventas del alumno (conservando su nombre) para no perder el historial al graduarse/eliminarse
-        List<Sale> sales = saleRepository.findByStudentId(id);
+        List<Sale> sales = saleRepository.findByStudent_Id(id);
         for (Sale sale : sales) {
             sale.setStudentName(student.getName());
             sale.setStudent(null);

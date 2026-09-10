@@ -46,7 +46,7 @@ public class SaleController {
 
     @GetMapping("/student/{studentId}")
     public List<Sale> getByStudent(@PathVariable Long studentId) {
-        return saleRepository.findByStudentId(studentId);
+        return saleRepository.findByStudent_Id(studentId);
     }
 
     @PostMapping
