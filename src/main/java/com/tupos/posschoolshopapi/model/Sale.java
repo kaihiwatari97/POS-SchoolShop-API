@@ -32,6 +32,9 @@ public class Sale {
     @ManyToOne
     private Student student;
 
+    // conserva el nombre del alumno aunque luego se elimine (ej: al graduarse), para no perder el historial
+    private String studentName;
+
     @OneToMany(cascade = CascadeType.ALL)
     private List<SaleDetail> saleDetails;
 
@@ -43,6 +46,7 @@ public class Sale {
     @JsonProperty("student")
     public String getStudentDisplay() {
         if (student != null) return student.getName();
+        if (studentName != null) return studentName; // alumno ya eliminado (ej: graduado), se conserva el nombre
         return paymentMethod == PaymentMethod.CARD ? "Venta con tarjeta" : "Venta en efectivo";
     }
 
@@ -62,6 +66,9 @@ public class Sale {
 
     public Student getStudent() { return student; }
     public void setStudent(Student student) { this.student = student; }
+
+    public String getStudentName() { return studentName; }
+    public void setStudentName(String studentName) { this.studentName = studentName; }
 
     public List<SaleDetail> getSaleDetails() { return saleDetails; }
     public void setSaleDetails(List<SaleDetail> saleDetails) { this.saleDetails = saleDetails; }

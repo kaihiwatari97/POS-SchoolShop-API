@@ -42,8 +42,9 @@ class StudentProdTest {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", "Bearer " + adminToken);
+        String controlNumber = String.format("%08d", System.currentTimeMillis() % 100000000L);
         HttpEntity<String> request = new HttpEntity<>(
-                "{ \"name\": \"Alumno Prod Test\", \"grade\": 1, \"level\": \"primaria\", \"group\": \"A\", \"prepaidBalance\": 50.0 }", headers);
+                "{ \"firstName\": \"Alumno\", \"paternalLastName\": \"Prod\", \"maternalLastName\": \"Test\", \"controlNumber\": \"" + controlNumber + "\", \"grade\": 1, \"level\": \"primaria\", \"group\": \"A\", \"prepaidBalance\": 50.0 }", headers);
 
         ResponseEntity<String> response = restTemplate.postForEntity(
                 BASE_URL + "/api/students", request, String.class);

@@ -1,11 +1,13 @@
 package com.tupos.posschoolshopapi.controller;
 
+import com.tupos.posschoolshopapi.exception.BadRequestException;
 import com.tupos.posschoolshopapi.model.Product;
 import com.tupos.posschoolshopapi.repository.ProductRepository;
 import com.tupos.posschoolshopapi.service.ActivityLogService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/products")
@@ -47,6 +49,19 @@ public class ProductController {
         product.setImageUrl(updated.getImageUrl());
         Product saved = productRepository.save(product);
         activityLogService.log("Edición de producto: " + saved.getName(), null);
+        return saved;
+    }
+
+    @PostMapping("/{id}/stock")
+    public Product addStock(@PathVariable Long id, @RequestBody Map<String, Object> request) {
+        Product product = productRepository.findById(id).orElseThrow();
+        Integer amount = Integer.valueOf(request.get("amount").toString());
+        if (amount <= 0) {
+            throw new BadRequestException("La cantidad a agregar debe ser mayor a 0.");
+        }
+        product.setStock(product.getStock() + amount);
+        Product saved = productRepository.save(product);
+        activityLogService.log("Reabastecimiento de stock: " + saved.getName() + " (+" + amount + ")", null);
         return saved;
     }
 

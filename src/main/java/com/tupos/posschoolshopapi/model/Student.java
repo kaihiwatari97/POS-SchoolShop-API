@@ -1,5 +1,6 @@
 package com.tupos.posschoolshopapi.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,7 +10,7 @@ import jakarta.persistence.Id;
 
 import java.time.LocalDate;
 
-@JsonPropertyOrder({"id", "name", "tutorName", "tutorPhone", "level", "grade", "group", "prepaidBalance", "enrollmentDate"})
+@JsonPropertyOrder({"id", "name", "firstName", "paternalLastName", "maternalLastName", "controlNumber", "tutorName", "tutorPhone", "level", "grade", "group", "prepaidBalance", "enrollmentDate"})
 @Entity
 public class Student {
 
@@ -17,7 +18,11 @@ public class Student {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
+    private String firstName;
+    private String paternalLastName;
+    private String maternalLastName;
+    private String controlNumber;
+
     private String grade;
     private String level;
 
@@ -34,8 +39,22 @@ public class Student {
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    @JsonProperty("name") // nombre completo calculado, se mantiene como propiedad de solo lectura para no romper todo lo que ya lee "name"
+    public String getName() {
+        return (firstName + " " + paternalLastName + " " + maternalLastName).trim().replaceAll("\\s+", " ");
+    }
+
+    public String getFirstName() { return firstName; }
+    public void setFirstName(String firstName) { this.firstName = firstName; }
+
+    public String getPaternalLastName() { return paternalLastName; }
+    public void setPaternalLastName(String paternalLastName) { this.paternalLastName = paternalLastName; }
+
+    public String getMaternalLastName() { return maternalLastName; }
+    public void setMaternalLastName(String maternalLastName) { this.maternalLastName = maternalLastName; }
+
+    public String getControlNumber() { return controlNumber; }
+    public void setControlNumber(String controlNumber) { this.controlNumber = controlNumber; }
 
     public String getGrade() { return grade; }
     public void setGrade(String grade) { this.grade = grade; }

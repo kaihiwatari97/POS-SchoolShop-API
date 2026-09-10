@@ -50,10 +50,36 @@ class StudentControllerTest {
         mockMvc.perform(post("/api/students")
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{ \"name\": \"Alumno Test\", \"grade\": 1, \"level\": \"primaria\", \"group\": \"A\", \"prepaidBalance\": 100.0 }"))
+                        .content("{ \"firstName\": \"Alumno\", \"paternalLastName\": \"Test\", \"maternalLastName\": \"Prueba\", \"controlNumber\": \"10000001\", \"grade\": 1, \"level\": \"primaria\", \"group\": \"A\", \"prepaidBalance\": 100.0 }"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Alumno Test"))
+                .andExpect(jsonPath("$.name").value("Alumno Test Prueba"))
                 .andExpect(jsonPath("$.prepaidBalance").value(100.0));
+    }
+
+    @Test
+    void noSePuedeCrearAlumnoConNumeroDeControlInvalido() throws Exception {
+        mockMvc.perform(post("/api/students")
+                        .header("Authorization", "Bearer " + adminToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{ \"firstName\": \"Alumno\", \"paternalLastName\": \"Test\", \"maternalLastName\": \"Prueba\", \"controlNumber\": \"123\" }"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void noSePuedeCrearAlumnoConNumeroDeControlDuplicado() throws Exception {
+        String body = "{ \"firstName\": \"Alumno\", \"paternalLastName\": \"Uno\", \"maternalLastName\": \"Prueba\", \"controlNumber\": \"10000002\" }";
+        mockMvc.perform(post("/api/students")
+                        .header("Authorization", "Bearer " + adminToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isOk());
+
+        String duplicado = "{ \"firstName\": \"Alumno\", \"paternalLastName\": \"Dos\", \"maternalLastName\": \"Prueba\", \"controlNumber\": \"10000002\" }";
+        mockMvc.perform(post("/api/students")
+                        .header("Authorization", "Bearer " + adminToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(duplicado))
+                .andExpect(status().isBadRequest());
     }
 
     @Test

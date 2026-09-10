@@ -71,6 +71,7 @@ public class SaleController {
                 throw new BadRequestException("El alumno no tiene saldo suficiente");
             }
             sale.setStudent(student);
+            sale.setStudentName(student.getName());
         }
 
         List<Map<String, Object>> items = (List<Map<String, Object>>) request.get("items");
